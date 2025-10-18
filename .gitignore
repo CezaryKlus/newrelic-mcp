@@ -1,5 +1,5 @@
 node_modules/
-dist/
+# dist/
 coverage/
 test-results/
 .env
@@ -25,7 +25,7 @@ test-results/
 
 # Test artifacts
 test-*.js
-*.js
+# *.js
 !vitest.config.js
 run-inspector.sh
 
