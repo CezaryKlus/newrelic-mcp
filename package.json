@@ -19,12 +19,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cloudbring/newrelic-mcp.git"
+    "url": "git+https://github.com/CezaryKlus/newrelic-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/cloudbring/newrelic-mcp/issues"
+    "url": "https://github.com/CezaryKlus/newrelic-mcp/issues"
   },
-  "homepage": "https://github.com/cloudbring/newrelic-mcp#readme",
+  "homepage": "https://github.com/CezaryKlus/newrelic-mcp#readme",
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/server.ts",
