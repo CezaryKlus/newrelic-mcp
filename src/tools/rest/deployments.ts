@@ -27,7 +27,9 @@ type DeleteDeploymentArgs = {
 export class RestDeploymentsTool {
   private restFor(region?: Region): NewRelicRestClient {
     const apiKey = process.env.NEW_RELIC_API_KEY as string;
-    return new NewRelicRestClient({ apiKey, region: region ?? 'US' });
+    const envRegion = (process.env.NEW_RELIC_REGION as Region | undefined) || 'US';
+    const effective = region ?? (envRegion === 'EU' ? 'EU' : 'US');
+    return new NewRelicRestClient({ apiKey, region: effective });
   }
 
   getCreateTool(): Tool {

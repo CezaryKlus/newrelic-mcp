@@ -1,4 +1,14 @@
-const NERDGRAPH_URL = 'https://api.newrelic.com/graphql';
+// NerdGraph endpoint will vary by region. US default, EU alternative.
+// We resolve it dynamically based on the NEW_RELIC_REGION environment variable.
+// Supported values: 'US' | 'EU'. Anything else falls back to 'US'.
+// Region type shared with REST client for consistency
+import type { Region } from './rest-client';
+
+function nerdGraphUrlForRegion(region: Region): string {
+  return region === 'EU'
+    ? 'https://api.eu.newrelic.com/graphql'
+    : 'https://api.newrelic.com/graphql';
+}
 
 type GraphQLError = { message: string; [key: string]: unknown };
 type GraphQLResponse<T> = { data?: T; errors?: GraphQLError[] };
@@ -34,10 +44,15 @@ export interface ApmApplication {
 export class NewRelicClient {
   private apiKey: string;
   private defaultAccountId?: string;
+  private region: Region;
+  private graphqlEndpoint: string;
 
   constructor(apiKey?: string, defaultAccountId?: string) {
     this.apiKey = apiKey || process.env.NEW_RELIC_API_KEY || '';
     this.defaultAccountId = defaultAccountId || process.env.NEW_RELIC_ACCOUNT_ID;
+    const envRegion = (process.env.NEW_RELIC_REGION as Region | undefined) || 'US';
+    this.region = envRegion === 'EU' ? 'EU' : 'US';
+    this.graphqlEndpoint = nerdGraphUrlForRegion(this.region);
   }
 
   async validateCredentials(): Promise<boolean> {
@@ -88,6 +103,7 @@ export class NewRelicClient {
     return {
       accountId: response.data.actor.account.id,
       name: response.data.actor.account.name,
+      region: this.region,
     };
   }
 
@@ -254,7 +270,7 @@ export class NewRelicClient {
       throw new Error('NEW_RELIC_API_KEY environment variable is not set');
     }
 
-    const response = await fetch(NERDGRAPH_URL, {
+    const response = await fetch(this.graphqlEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -273,3 +289,6 @@ export class NewRelicClient {
     return (await response.json()) as GraphQLResponse<T>;
   }
 }
+
+// Expose internal helpers for testing
+export const __test__ = { nerdGraphUrlForRegion };

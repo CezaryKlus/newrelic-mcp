@@ -5,6 +5,7 @@
 You need two main credentials:
 1. **NEW_RELIC_API_KEY** - User API Key for NerdGraph/API access
 2. **NEW_RELIC_ACCOUNT_ID** - Your New Relic account ID
+3. (Optional) **NEW_RELIC_REGION** - Set to `EU` to use European endpoints. Defaults to `US`.
 
 ## Step 1: Get Your Account ID
 
@@ -84,6 +85,31 @@ curl -X POST http://localhost:3000/rpc \
 - If you hit limits, wait a few minutes before retrying
 
 ## Security Notes
+## Region Selection
+
+The server auto-selects the correct New Relic API endpoints based on the `NEW_RELIC_REGION` environment variable.
+
+Supported values:
+
+- `US` (default if unset or any other value)
+- `EU`
+
+Endpoints affected:
+
+- NerdGraph GraphQL (`https://api.newrelic.com/graphql` vs `https://api.eu.newrelic.com/graphql`)
+- REST v2 (`https://api.newrelic.com/v2` vs `https://api.eu.newrelic.com/v2`)
+- Logs API (already region-aware in logging utilities)
+
+Example `.env` snippet:
+
+```
+NEW_RELIC_API_KEY=YOUR_USER_KEY
+NEW_RELIC_ACCOUNT_ID=1234567
+NEW_RELIC_REGION=EU
+```
+
+If you omit `NEW_RELIC_REGION`, the US endpoints are used. Invalid values also fall back to US.
+
 
 - **NEVER** commit your `.env` file to git
 - Store credentials securely (use 1Password, as noted in your .env)
